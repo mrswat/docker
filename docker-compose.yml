@@ -3,7 +3,7 @@ version: '3.9'
 services:
   
   dockertest:
-    image: docker-test
+    image: artempimenov/docker-test
     environment:
       - 'ConnectionStrings:DefaultConnection=User ID=DockerTestUser;Password=password123;Server=postgres;Port=5432;Database=DockerTestDb'
     ports:
