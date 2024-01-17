@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  
+  dockertest:
+    image: docker-test
+    environment:
+      - 'ConnectionStrings:DefaultConnection=User ID=DockerTestUser;Password=password123;Server=postgres;Port=5432;Database=DockerTestDb'
+    ports:
+      - 8000:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      dockertest:
+        aliases:
+          - dockertest      
+  
+  postgres:
+    image: postgres:16.1
+    environment:
+      - POSTGRES_DB=DockerTestDb      
+      - POSTGRES_USER=DockerTestUser
+      - POSTGRES_PASSWORD=password123
+    volumes:
+      - .:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+      - ./servers.json:/pgadmin4/servers.json # preconfigured servers/connections
+      - ./pgpass:/pgpass # passwords for the connections in this file      
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: always
+    networks:
+      dockertest:
+        aliases:
+          - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4:8.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "pimenovswat@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadminpassword"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - 5050:80
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+     dockertest:
+        aliases:
+          - pgadmin
+
+networks:
+  dockertest:
+
+volumes:
+  pgdata:
+  pgadmin:
+      

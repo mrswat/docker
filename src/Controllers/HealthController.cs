@@ -7,7 +7,7 @@ namespace DockerTest.Controllers
     public class HealthController : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Check()
         {
             return Ok(new { Status = "OK" });
         }
